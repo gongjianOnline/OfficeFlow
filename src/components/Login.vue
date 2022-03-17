@@ -5,11 +5,20 @@
   </div>
 </template>
 
-<script setup>
-import {useRouter} from "vue-router"
-const router = useRouter()
-const goHome = ()=>{
-  router.push("/welcome")
+<script>
+export default {
+  name:"login",
+  mounted(){
+    this.$axios({
+      method:"get",
+      url:"/login"
+    }).then((response)=>{
+      console.log(response)
+    })
+  },
+  methods:{
+
+  }
 }
 </script>
 
