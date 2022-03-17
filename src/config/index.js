@@ -4,17 +4,17 @@
 */
 const env = import.meta.env.MODE || "prod";
 const EnvConfig = {
-  dev:{
+  development:{
     baseApi:"/",
-    mockApi:""
+    mockApi:"http://www.baidu.com"
   },
   test:{
     baseApi:"/",
-    mockApi:""
+    mockApi:"http://www.baidu.com"
   },
   prod:{
     baseApi:"/",
-    mockApi:""
+    mockApi:"http://www.baidu.com"
   }
 }
 
