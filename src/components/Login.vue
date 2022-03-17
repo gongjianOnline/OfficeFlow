@@ -9,11 +9,14 @@
 export default {
   name:"login",
   mounted(){
-    this.$axios({
-      method:"get",
-      url:"/login"
-    }).then((response)=>{
-      console.log(response)
+    // this.$axios({
+    //   method:"get",
+    //   url:"/login"
+    // }).then((response)=>{
+    //   console.log(response)
+    // })
+    this.$axios.get("login",{userName:"lilei",pas:"123"}).then((response)=>{
+      sconsole.log(response)
     })
   },
   methods:{
