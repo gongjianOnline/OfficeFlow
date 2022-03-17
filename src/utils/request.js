@@ -43,19 +43,18 @@ service.interceptors.response.use((res)=>{
 
 /**
  * 请求核心函数
- *  
  */
 function request(options){
-  options.method = options.method || "get";
+  options.method = options.method || 'get'
   if(options.method.toLowerCase() === 'get'){
     options.params = options.data;
   }
-  if(config.env === "prod"){
+  if(config.env === 'prod'){
     service.defaults.baseURL = config.baseApi
   }else{
     service.defaults.baseURL = config.mock?config.mockApi:config.baseApi
   }
-  service(options)
+  return service(options)
 }
 
 ['get',"post","put","delete","patch"].forEach((item)=>{

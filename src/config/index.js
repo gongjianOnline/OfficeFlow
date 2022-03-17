@@ -6,15 +6,15 @@ const env = import.meta.env.MODE || "prod";
 const EnvConfig = {
   development:{
     baseApi:"/",
-    mockApi:"http://192.168.182.128:20080/mock/6232dfc65f93ec000c0ded64"
+    mockApi:"https://www.fastmock.site/mock/4965a21a9ddd5519b4fae0c67ead20f8/api"
   },
   test:{
     baseApi:"/",
-    mockApi:"http://192.168.182.128:20080/mock/6232dfc65f93ec000c0ded64"
+    mockApi:"https://www.fastmock.site/mock/4965a21a9ddd5519b4fae0c67ead20f8/api"
   },
   prod:{
     baseApi:"/",
-    mockApi:"http://192.168.182.128:20080/mock/6232dfc65f93ec000c0ded64"
+    mockApi:"https://www.fastmock.site/mock/4965a21a9ddd5519b4fae0c67ead20f8/api"
   }
 }
 

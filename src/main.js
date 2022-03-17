@@ -7,7 +7,7 @@ import App from './App.vue'
 
 const app = createApp(App)
 
-app.config.globalProperties.$axios = request
+app.config.globalProperties.$request = request
 app.use(router)
 app.use(ElementPlus)
 app.mount('#app')
