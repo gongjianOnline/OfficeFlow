@@ -1,5 +1,5 @@
 <template>
-  <div> 
+  <div class="welcome"> 
     Welcome page
   </div>
 </template>
@@ -19,5 +19,7 @@ export default {
 </script>
 
 <style>
-
+.welcome{
+  
+}
 </style>
