@@ -6,7 +6,15 @@
 
 <script>
 export default {
+  name:"welcome",
+  data(){
+    return {
 
+    }
+  },
+  mounted(){
+    
+  }
 }
 </script>
 
