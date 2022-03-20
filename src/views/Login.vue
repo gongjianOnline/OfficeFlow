@@ -1,21 +1,26 @@
 <template>
   <div class="login-wrapper"> 
     <div class="modal">
-      <el-form>
+      <el-form :model="user"
+        :rules="rules">
         <div class="title">火星</div>
-        <el-form-item class="fromItem">
-          <el-input type="text" 
+        <el-form-item class="fromItem" prop="name">
+          <el-input type="text"
+            clearable
+            v-model="user.user"
             placeholder="请输入用户名"
             prefix-icon="Avatar"></el-input>
         </el-form-item>
-        <el-form-item class="fromItem">
-          <el-input type="password" 
+        <el-form-item class="fromItem" prop="password">
+          <el-input type="password"
+            clearable 
+            v-model="user.password"
             placeholder="请输入密码" 
             show-password
             prefix-icon="Lock"></el-input>
         </el-form-item>
         <el-form-item class="fromItem">
-          <el-button type="primary" class="btn-login">登录</el-button>
+          <el-button type="primary" class="btn-login" @click="handelLogin">登录</el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -25,19 +30,34 @@
 <script>
 export default {
   name:"login",
+  data(){
+    return {
+      user:{
+        user:"",
+        password:"",
+      },
+      rules:{
+        name:[
+          {required: true, message: '用户名不能为空', trigger: 'blur' }
+        ],
+        password:[
+          {required: true, message: '密码不能为空', trigger: 'blur' }
+        ]
+      }
+    }
+  },
   mounted(){
-    // this.$request({
-    //   method:"get",
-    //   url:"/login"
-    // }).then((response)=>{
-    //   console.log(response)
-    // })
-    this.$request.get("login",{userName:"lilei",pas:"123"}).then((response)=>{
-      console.log(response)
-    })
+    
   },
   methods:{
-
+    handelLogin(){
+      this.$request({
+        method:"post",
+        url:"/user/login"
+      }).then((response)=>{
+        console.log(response)
+      })
+    }
   }
 }
 </script>
