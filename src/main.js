@@ -6,6 +6,7 @@ import request from "./utils/request"
 import storage from './utils/storage'
 import 'element-plus/dist/index.css'
 import App from './App.vue'
+import store from './store'
 
 const app = createApp(App)
 //使用elementPlus图标
@@ -18,5 +19,6 @@ app.config.globalProperties.$storage = storage
 
 app.use(router)
 app.use(ElementPlus)
+app.use(store)
 app.mount('#app')
 

@@ -55,6 +55,7 @@ export default {
         method:"post",
         url:"/user/login"
       }).then((response)=>{
+        this.$store.commit('saveUserInfo',response)
         console.log(response)
       })
     }
