@@ -24,7 +24,7 @@ const routes = [
       {
         name:"welcome",
         meta:{
-          title:"欢迎"
+          title:"欢迎页"
         },
         path:"/welcome",
         component:Welcome,

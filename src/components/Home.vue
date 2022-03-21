@@ -22,7 +22,9 @@
             <el-icon v-show="isCollapse"><fold /></el-icon>
             <el-icon v-show="!isCollapse"><Expand /></el-icon>
           </div>
-          <div class="bread">面包屑</div>
+          <div class="bread">
+            <BreadCrumb/>
+          </div>
         </div>
         <div class="nav-right">
           <div class="menu-bell ">
@@ -54,10 +56,12 @@
 
 <script>
 import TreeMenu from "../components/TreeMenu.vue"
+import BreadCrumb from "../components/BreadCrumb.vue"
 export default {
   name:"Home",
   components:{
-    TreeMenu
+    TreeMenu,
+    BreadCrumb
   },
   data(){
     return{
@@ -93,7 +97,6 @@ export default {
         method:"get",
         data:{}
       })
-      console.log("获取动态菜单",response)
       this.userMenu = response
     }
   }
