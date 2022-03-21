@@ -20,7 +20,7 @@ const EnvConfig = {
 
 export default {
   env,
-  mock:false,
+  mock:true,
   namespace:"namespace",
   ...EnvConfig[env]
 }

@@ -60,6 +60,7 @@ export default {
         }
       }).then((response)=>{
         this.$store.commit('saveUserInfo',response)
+        this.$router.push({name:'welcome'})
       })
     }
   }
