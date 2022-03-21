@@ -1,6 +1,6 @@
 <template>
   <div class="basic-layout">
-    <div class="nav-side">
+    <div class="nav-side" :class="[isCollapse?'':'noneSid']">
       <div class="logo">
         <img src="../assets/logo.png" alt="">
         <span>Manager</span>
@@ -29,11 +29,12 @@
 
       </el-menu>
     </div>
-    <div class="content-right">
+    <div class="content-right" :class="[isCollapse?'':'autoRight']">
       <div class="nav-top">
         <div class="nav-left">
           <div class="menu-fold" @click="toggle">
-            <el-icon><fold /></el-icon>
+            <el-icon v-show="isCollapse"><fold /></el-icon>
+            <el-icon v-show="!isCollapse"><Expand /></el-icon>
           </div>
           <div class="bread">面包屑</div>
         </div>
@@ -70,6 +71,7 @@ export default {
   name:"Home",
   data(){
     return{
+      isCollapse:true,
       userInfo:this.$store.state.userInfo,
       noticeDount:0,
     }
@@ -79,7 +81,8 @@ export default {
   },
   methods:{
     toggle(){
-
+      console.log("123")
+      this.isCollapse = !this.isCollapse
     },
     handelOut(){
       this.$router.replace({name:"login"})
@@ -123,8 +126,17 @@ export default {
       }
     }
   }
+  .noneSid{
+    width:0px !important;
+    transition: width 0.5s;
+  }
+  .autoRight{
+    margin-left:0px !important;
+    transition: margin-left 0.5s;
+  }
   .content-right{
     margin-left: 200px;
+    transition: margin-left 0.5s;
     .nav-top{
       height: 50px;
       line-height: 50px;
