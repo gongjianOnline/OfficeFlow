@@ -14,7 +14,7 @@ for(const name in ElIcons){
   app.component(name,ElIcons[name])
 }
 
-app.config.globalProperties.$request = request
+app.config.globalProperties.$request = request 
 app.config.globalProperties.$storage = storage
 
 app.use(router)

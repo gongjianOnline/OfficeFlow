@@ -13,7 +13,6 @@ const service = axios.create({
   baseURL:config.baseApi,
   timeout:8000,
 })
-
 //请求拦截
 service.interceptors.request.use((req)=>{
   // TO-DO
@@ -29,7 +28,7 @@ service.interceptors.response.use((res)=>{
   const {code,data,msg} = res.data;
   if(code === 200){
     return data 
-  } else if (code === 40001){
+  } else if (code === 50001){
     ElMessage.error(TOKEN_INVALID)
     setTimeout(()=>{
       router.push("/login")
@@ -49,9 +48,11 @@ function request(options){
   if(options.method.toLowerCase() === 'get'){
     options.params = options.data;
   }
+  console.log("---",config.env)
   if(config.env === 'prod'){
     service.defaults.baseURL = config.baseApi
   }else{
+    console.log("---", config.mock?config.mockApi:config.baseApi)
     service.defaults.baseURL = config.mock?config.mockApi:config.baseApi
   }
   return service(options)

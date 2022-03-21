@@ -53,7 +53,7 @@ export default {
     handelLogin(){
       this.$request({
         method:"post",
-        url:"/user/login"
+        url:"/users/login"
       }).then((response)=>{
         this.$store.commit('saveUserInfo',response)
         console.log(response)
