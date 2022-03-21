@@ -12,21 +12,7 @@
         class="el-menu-vertical-demo"
         text-color="#fff"
       >
-        <el-sub-menu index="1">
-          <template #title>
-            <span>系统管理</span>
-          </template>
-          <el-menu-item index="1-1">用户管理</el-menu-item>
-          <el-menu-item index="1-2">菜单管理</el-menu-item>
-        </el-sub-menu>
-        <el-sub-menu index="2">
-          <template #title>
-            <span>审批管理</span>
-          </template>
-          <el-menu-item index="2-1">休假管理</el-menu-item>
-          <el-menu-item index="2-2">代我审批</el-menu-item>
-        </el-sub-menu>
-
+        <TreeMenu :userMenu="userMenu"/>  
       </el-menu>
     </div>
     <div class="content-right" :class="[isCollapse?'':'autoRight']">
@@ -67,32 +53,48 @@
 </template>
 
 <script>
+import TreeMenu from "../components/TreeMenu.vue"
 export default {
   name:"Home",
+  components:{
+    TreeMenu
+  },
   data(){
     return{
       isCollapse:true,
       userInfo:this.$store.state.userInfo,
       noticeDount:0,
+      userMenu:[]
     }
   },
   mounted(){
     this.gitNoticeCount()
+    this.getMenuList()
   },
   methods:{
     toggle(){
-      console.log("123")
       this.isCollapse = !this.isCollapse
     },
     handelOut(){
       this.$router.replace({name:"login"})
     },
+    // 获取通知数量
     async gitNoticeCount(){
       let response = await this.$request({
         method:'get',
         url:"/leave/count"
       })
       this.noticeDount = response
+    },
+    // 获取动态菜单
+    async getMenuList(){
+      let response = await this.$request({
+        url:'/menu/list',
+        method:"get",
+        data:{}
+      })
+      console.log("获取动态菜单",response)
+      this.userMenu = response
     }
   }
 
