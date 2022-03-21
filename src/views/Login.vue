@@ -4,7 +4,7 @@
       <el-form :model="user"
         :rules="rules">
         <div class="title">火星</div>
-        <el-form-item class="fromItem" prop="name">
+        <el-form-item class="fromItem" prop="user">
           <el-input type="text"
             clearable
             v-model="user.user"
@@ -37,7 +37,7 @@ export default {
         password:"",
       },
       rules:{
-        name:[
+        user:[
           {required: true, message: '用户名不能为空', trigger: 'blur' }
         ],
         password:[
@@ -53,10 +53,13 @@ export default {
     handelLogin(){
       this.$request({
         method:"post",
-        url:"/users/login"
+        url:"/users/login",
+        data:{
+          userName:this.user.user,
+          userPwd:this.user.password
+        }
       }).then((response)=>{
         this.$store.commit('saveUserInfo',response)
-        console.log(response)
       })
     }
   }
