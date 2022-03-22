@@ -5,6 +5,7 @@ import axios from "axios"
 import config from "../config/index"
 import {ElMessage} from "element-plus"
 import router from "./../router/index"
+import storage from "./storage"
 const TOKEN_INVALID = "Token认证失败，请重新登录"
 const NETWORK_ERROR = "网络请求异常，请稍后充实"
 
@@ -18,7 +19,7 @@ service.interceptors.request.use((req)=>{
   // TO-DO
   const headers = req.headers;
   if(!headers.Authorization){
-    headers.Authorization = "Bear Jack"
+    headers.Authorization = (storage.getItem("userInfo"))?"Bearer "+storage.getItem("userInfo").token:""
   }
   return req;
 })
@@ -28,10 +29,10 @@ service.interceptors.response.use((res)=>{
   const {code,data,msg} = res.data;
   if(code === 200){
     return data 
-  } else if (code === 50001){
+  } else if (code === 40001){
     ElMessage.error(TOKEN_INVALID)
     setTimeout(()=>{
-      router.push("/login")
+      router.replace({name:"login"})
     },3000)
     return Promise.reject(TOKEN_INVALID)
   }else{

@@ -105,7 +105,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.nav-right::v-deep .el-badge__content{
+:deep(.el-badge__content){
   top: 10px !important;
 }
 .basic-layout{
