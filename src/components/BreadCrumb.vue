@@ -17,10 +17,13 @@ export default {
   },
   computed:{
     breadList(){
+      console.log(this.$route.matched)
       return this.$route.matched
     }
   },
-  mounted(){}
+  mounted(){
+    console.log(this.$route.matched)
+  }
 
 }
 </script>

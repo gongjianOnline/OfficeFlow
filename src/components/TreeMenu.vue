@@ -6,6 +6,7 @@
       </template>
       <el-menu-item 
         v-for="(itemChild) in item.children"
+        @click="handelClick(itemChild)"
         :key="itemChild._id"
         :index="itemChild.path" >{{itemChild.menuName}}</el-menu-item>
     </el-sub-menu>
@@ -27,6 +28,14 @@ export default {
   data() {
     return {};
   },
+  methods:{
+    handelClick(routerData){
+      // routerData.path = (routerData.path).substring(1,routerData.path.length-1)
+      // let routerUrl = (routerData.path).substring(1,routerData.path.length-1)
+      console.log(routerData.path)
+      this.$router.push({path:routerData.path})
+    }
+  }
 };
 </script>
 
