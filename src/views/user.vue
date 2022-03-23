@@ -30,12 +30,13 @@
     <div class="base-table">
       <div class="action">
         <el-button type="primary">新增</el-button>
-        <el-button type="danger">批量删除</el-button>
+        <el-button type="danger" @click="handlePatchDele">批量删除</el-button>
       </div>
-      <el-table :data="userList">
+      <el-table :data="userList"
+        @selection-change="handleSelectionChange">
         <el-table-column type="selection" 
           width="55"></el-table-column>
-        <el-table-column 
+        <el-table-column
           v-for="item in colums"
           :key="item.prop"
           :prop="item.prop" 
@@ -118,6 +119,8 @@ export default{
       pageNum:1,
       pageSize:10
     })
+    // 初始化表格选中状态
+    const checkedUserIds = ref([])
     // 查询事件
     const handleQuery = ()=>{
       getUserList()
@@ -132,13 +135,51 @@ export default{
       console.log(row)
     }
     // 删除事件
-    const handleDelect = (index,row)=>{
+    const handleDelect = async (index,row)=>{
       console.log(row)
+      await proxy.$request({
+        method:"post",
+        url:'/users/delete',
+        data:{
+          userIds:[row.userId]
+        }
+      })
+      proxy.$message.success('删除成功')
+      getUserList()
     }
     // 分页事件
     const handelCurrentChange = (current)=>{
       pager.pageNum = current;
       getUserList()
+    }
+    // 批量删除
+    const handlePatchDele = async ()=>{
+      if(checkedUserIds.value.length>0){
+        let response = await proxy.$request({
+          method:"post",
+          url:'/users/delete',
+          data:{
+            userIds:checkedUserIds.value
+          }
+        })
+        console.log(response)
+        if(response.nModified > 0){
+          proxy.$message.success("清除成功")
+          getUserList()
+        }else{
+          proxy.$message.error("清除失败")
+        }
+      }else{
+        proxy.$message.error("请选择要删除的数据")
+      }
+    }
+    // 表格批量选择
+    const handleSelectionChange = (list)=>{
+      const arr = []
+      list.map((item,index)=>{
+        arr[index] = item.userId
+      })
+      checkedUserIds.value = arr
     }
     onMounted(()=>{
       getUserList()
@@ -160,11 +201,14 @@ export default{
       userList,
       colums,
       pager,
+      checkedUserIds,
       handleEdit,
       handleDelect,
       handleQuery,
       handleReset,
-      handelCurrentChange
+      handelCurrentChange,
+      handlePatchDele,
+      handleSelectionChange
     } 
   }
 }
