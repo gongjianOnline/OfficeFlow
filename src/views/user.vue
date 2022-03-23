@@ -41,7 +41,8 @@
           :key="item.prop"
           :prop="item.prop" 
           :label="item.label" 
-          :width="item.width" />
+          :width="item.width"
+          :formatter="item.formatter" />
         <el-table-column label="操作" width="180">
           <template #default="scope">
             <el-button size="small"
@@ -98,11 +99,29 @@ export default{
       },
       {
         label:"用户角色",
-        prop:"role"
+        prop:"role",
+        formatter:(row,index,value)=>{
+          switch(value){
+            case "0":
+              return "系统管理员"
+            default: 
+              return "普通用户"
+          }
+        }
       },
       {
         label:"用户状态",
         prop:"state",
+        formatter:(row,index,value)=>{
+          switch(value){
+            case 1:
+              return "在职"
+            case 2:
+              return "离职"
+            default: 
+              return "试用期"
+          }
+        }
       },
       {
         label:"注册时间",
