@@ -29,7 +29,7 @@
     </div>
     <div class="base-table">
       <div class="action">
-        <el-button type="primary">新增</el-button>
+        <el-button type="primary" @click="handleCreate">新增</el-button>
         <el-button type="danger" @click="handlePatchDele">批量删除</el-button>
       </div>
       <el-table :data="userList"
@@ -64,6 +64,64 @@
           :total="pager.total" />
       </div>
     </div>
+
+    <!-- 新增模态框 -->
+    <el-dialog
+    v-model="addUserDialog"
+    title="新增用户"
+    width="60%">
+      <el-form ref="dialogForm" 
+        :model="userForm" 
+        :rules="rules"
+        label-width="120px">
+        <el-form-item label="用户名" prop="userName">
+          <el-input v-model="userForm.userName" />
+        </el-form-item>
+        <el-form-item label="邮箱" prop="userEmail">
+          <el-input v-model="userForm.userEmail" >
+            <template #append>@imooc.com</template>
+          </el-input>
+        </el-form-item>
+        <el-form-item label="手机号" prop="mobile">
+          <el-input v-model="userForm.mobile" />
+        </el-form-item>
+        <el-form-item label="岗位" prop="job">
+          <el-input v-model="userForm.job" />
+        </el-form-item>
+        <el-form-item label="状态" prop="job">
+          <el-select v-model="userForm.state">
+            <el-option :value="1" label="在职"></el-option>
+            <el-option :value="2" label="离职"></el-option>
+            <el-option :value="3" label="试用期"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="系统角色" prop="roleList">
+          <el-select
+            v-model="userForm.roleList"
+            placeholder="请选择用户系统角色"
+            multiple
+            style="width: 100%">
+            <el-option label="系统管理员" value="1"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="部门" prop="deptId">
+          <el-cascader
+            v-model="userForm.deptId"
+            placeholder="请选择所属部门"
+            :options="deptList"
+            :props="{ checkStrictly: true, value: '_id', label: 'deptName' }"
+            clearable
+            style="width: 100%"
+          ></el-cascader>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="handleClose">取 消</el-button>
+          <el-button type="primary" @click="handleSubmit">确 定</el-button>
+        </span>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -140,13 +198,36 @@ export default{
     })
     // 初始化表格选中状态
     const checkedUserIds = ref([])
+    // 初始化新增用户模态框状态
+    let addUserDialog = ref(false)
+    // 新增用户表单验证
+    const rules = reactive({
+      userName:[
+        {required: true, message: '用户名不能为空', trigger: 'blur'}
+      ],
+      userEmail:[
+        {required: true, message: '邮箱不能为空', trigger: 'blur'},
+      ],
+      mobile:[
+        {required: true, message: '手机号不能为空', trigger: 'blur'},
+        {
+          pattern: /^[1](([3][0-9])|([4][5-9])|([5][0-3,5-9])|([6][5,6])|([7][0-8])|([8][0-9])|([9][1,8,9]))[0-9]{8}$/, 
+          message: '手机格式不正确', 
+          trigger: 'blur'}
+      ],
+    })
+    // 新增用户表单
+    const userForm = reactive({
+      state:1
+    })
+    // 所属部门列表
+    const deptList = reactive([])
     // 查询事件
     const handleQuery = ()=>{
       getUserList()
     }
     // 重置事件
     const handleReset = ()=>{
-      console.log(1111,)
       proxy.$refs.form.resetFields()
     }
     // 编辑事件
@@ -155,7 +236,6 @@ export default{
     }
     // 删除事件
     const handleDelect = async (index,row)=>{
-      console.log(row)
       await proxy.$request({
         method:"post",
         url:'/users/delete',
@@ -181,7 +261,6 @@ export default{
             userIds:checkedUserIds.value
           }
         })
-        console.log(response)
         if(response.nModified > 0){
           proxy.$message.success("清除成功")
           getUserList()
@@ -199,6 +278,19 @@ export default{
         arr[index] = item.userId
       })
       checkedUserIds.value = arr
+    }
+    // 新增用户事件
+    const handleCreate = ()=>{
+      addUserDialog.value = true
+    }
+    // 新增用户取消按钮
+    const handleClose = ()=>{
+      proxy.$refs.dialogForm.resetFields();
+      addUserDialog.value = false
+    }
+    // 新增用户确定按钮
+    const handleSubmit = ()=>{
+
     }
     onMounted(()=>{
       getUserList()
@@ -221,13 +313,20 @@ export default{
       colums,
       pager,
       checkedUserIds,
+      addUserDialog,
+      userForm,
+      deptList,
+      rules,
       handleEdit,
       handleDelect,
       handleQuery,
       handleReset,
       handelCurrentChange,
       handlePatchDele,
-      handleSelectionChange
+      handleSelectionChange,
+      handleCreate,
+      handleClose,
+      handleSubmit
     } 
   }
 }
