@@ -101,7 +101,10 @@
             placeholder="请选择用户系统角色"
             multiple
             style="width: 100%">
-            <el-option label="系统管理员" value="1"></el-option>
+            <el-option v-for="(item) in roleList"
+              :key="item._id"
+              :label="item.roleName" 
+              :value="item._id"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="部门" prop="deptId">
@@ -126,7 +129,7 @@
 </template>
 
 <script>
-import {getCurrentInstance, onMounted,reactive,ref} from "vue"
+import {getCurrentInstance, onMounted,reactive,ref,toRaw} from "vue"
 export default{
   name:"user",
   setup(){
@@ -220,8 +223,12 @@ export default{
     const userForm = reactive({
       state:1
     })
+    // 初始化用户列表
+    const roleList = ref([])
     // 所属部门列表
-    const deptList = reactive([])
+    const deptList = ref([])
+    // 创建和编辑状态
+    const action = ref('add')
     // 查询事件
     const handleQuery = ()=>{
       getUserList()
@@ -290,10 +297,29 @@ export default{
     }
     // 新增用户确定按钮
     const handleSubmit = ()=>{
-
+      proxy.$refs.dialogForm.validate(async (valid)=>{
+        if(valid){
+          let params = toRaw(userForm);
+          params.userEmail += "@imooc.com"
+          params.action = action.value
+          let response = await proxy.$request({
+            method:"post",
+            url:"/users/operate",
+            data:params
+          })
+          if(response){
+            addUserDialog.value = false;
+            proxy.$message.success("用户创建成功")
+            proxy.$refs.dialogForm.resetFields()
+            getUserList()
+          }
+        }
+      })
     }
     onMounted(()=>{
-      getUserList()
+      getUserList();
+      getRoleList();
+      getDeptList()
     })
     // 获取用户列表接口
     const getUserList = async ()=>{
@@ -306,6 +332,24 @@ export default{
       userList.value = response.list;
       pager.total = response.page.total
     }
+    // 获取部门列表
+    const getDeptList = async ()=>{
+      let response = await proxy.$request({
+        method:"get",
+        url:"/dept/list"
+      })
+      console.log("=>",response)
+      deptList.value = response
+    }
+    // 获取角色列表
+    const getRoleList = async ()=>{
+      let response = await proxy.$request({
+        method:'get',
+        url:'/roles/allList'
+      })
+      roleList.value = response
+    }
+
 
     return {
       user,
@@ -317,6 +361,7 @@ export default{
       userForm,
       deptList,
       rules,
+      roleList,
       handleEdit,
       handleDelect,
       handleQuery,
