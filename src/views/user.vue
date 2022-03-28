@@ -69,16 +69,17 @@
     <el-dialog
     v-model="addUserDialog"
     title="新增用户"
-    width="60%">
+    width="60%"
+    :show-close="false">
       <el-form ref="dialogForm" 
         :model="userForm" 
         :rules="rules"
         label-width="120px">
         <el-form-item label="用户名" prop="userName">
-          <el-input v-model="userForm.userName" />
+          <el-input v-model="userForm.userName" :disabled="action=='edit'" />
         </el-form-item>
         <el-form-item label="邮箱" prop="userEmail">
-          <el-input v-model="userForm.userEmail" >
+          <el-input v-model="userForm.userEmail" :disabled="action==='edit'">
             <template #append>@imooc.com</template>
           </el-input>
         </el-form-item>
@@ -139,7 +140,7 @@ export default{
     const user = reactive({
       userId:"",
       userName:"",
-      state:0
+      state:1
     })
     // 初始化用户列表数据
     const userList = ref([]);
@@ -239,7 +240,11 @@ export default{
     }
     // 编辑事件
     const handleEdit = (index,row)=>{
-      console.log(row)
+      action.value = "edit";
+      addUserDialog.value = true;
+      proxy.$nextTick(()=>{
+        Object.assign(userForm,row);
+      })
     }
     // 删除事件
     const handleDelect = async (index,row)=>{
@@ -288,6 +293,7 @@ export default{
     }
     // 新增用户事件
     const handleCreate = ()=>{
+      action.value = "add"
       addUserDialog.value = true
     }
     // 新增用户取消按钮
@@ -362,6 +368,7 @@ export default{
       deptList,
       rules,
       roleList,
+      action,
       handleEdit,
       handleDelect,
       handleQuery,
