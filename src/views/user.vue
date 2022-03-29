@@ -253,7 +253,8 @@ export default{
         url:'/users/delete',
         data:{
           userIds:[row.userId]
-        }
+        },
+        mock:false
       })
       proxy.$message.success('删除成功')
       getUserList()
