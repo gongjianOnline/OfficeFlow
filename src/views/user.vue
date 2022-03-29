@@ -140,7 +140,7 @@ export default{
     const user = reactive({
       userId:"",
       userName:"",
-      state:1
+      state:0
     })
     // 初始化用户列表数据
     const userList = ref([]);
@@ -219,6 +219,9 @@ export default{
           message: '手机格式不正确', 
           trigger: 'blur'}
       ],
+      deptId:[
+        {required: true, message: '部门不能为空', trigger: 'blur'},
+      ]
     })
     // 新增用户表单
     const userForm = reactive({
@@ -312,14 +315,13 @@ export default{
           let response = await proxy.$request({
             method:"post",
             url:"/users/operate",
-            data:params
+            data:params,
+            mock:false
           })
-          if(response){
-            addUserDialog.value = false;
-            proxy.$message.success("用户创建成功")
-            proxy.$refs.dialogForm.resetFields()
-            getUserList()
-          }
+          proxy.$refs.dialogForm.resetFields();
+          addUserDialog.value = false;
+          proxy.$message.success("用户创建成功")
+          getUserList()
         }
       })
     }
@@ -346,7 +348,6 @@ export default{
         method:"get",
         url:"/dept/list"
       })
-      console.log("=>",response)
       deptList.value = response
     }
     // 获取角色列表
