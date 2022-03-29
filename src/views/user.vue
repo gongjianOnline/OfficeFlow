@@ -333,7 +333,8 @@ export default{
       let response = await proxy.$request({
         method:"get",
         url:"/users/all/list",
-        data:params
+        data:params,
+        mock:false
       })
       userList.value = response.list;
       pager.total = response.page.total

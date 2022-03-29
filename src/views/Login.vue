@@ -57,7 +57,8 @@ export default {
         data:{
           userName:this.user.user,
           userPwd:this.user.password
-        }
+        },
+        mock:false
       }).then((response)=>{
         this.$store.commit('saveUserInfo',response)
         this.$router.push({name:'welcome'})

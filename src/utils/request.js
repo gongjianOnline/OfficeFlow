@@ -49,12 +49,16 @@ function request(options){
   if(options.method.toLowerCase() === 'get'){
     options.params = options.data;
   }
-  console.log("---",config.env)
+  // console.log("---",config.env)
   if(config.env === 'prod'){
     service.defaults.baseURL = config.baseApi
   }else{
-    console.log("---", config.mock?config.mockApi:config.baseApi)
-    service.defaults.baseURL = config.mock?config.mockApi:config.baseApi
+    if(options.mock === false){
+      service.defaults.baseURL = config.baseApi
+    }else{
+      service.defaults.baseURL = config.mock?config.mockApi:config.baseApi
+    }
+    
   }
   return service(options)
 }
