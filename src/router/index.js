@@ -3,6 +3,7 @@ import Home from "../components/Home.vue"
 const Welcome = ()=>import("../views/Welcome.vue")
 const Login = ()=>import("../views/Login.vue")
 const User = ()=>import("../views/user.vue")
+const Menu = ()=>import("../views/menu.vue")
 
 const routes = [
   {
@@ -37,6 +38,14 @@ const routes = [
         },
         path:"system/user",
         component:User,
+      },
+      {
+        name:"menu",
+        meta:{
+          title:"菜单管理"
+        },
+        path:"system/menu",
+        component:Menu,
       },
       
     ]
