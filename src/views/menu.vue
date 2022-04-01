@@ -21,7 +21,7 @@
     </div>
     <div class="base-table">
       <div class="action">
-        <el-button type="primary" @click="handelAdd">新增</el-button>
+        <el-button type="primary" @click="handleAdd(1)">新增</el-button>
       </div>
       <el-table 
         :data="menuList" 
@@ -40,7 +40,7 @@
             <el-button
               size="small"
               type="primary"
-              @click="handleAdd(scope.$index, scope.row)"
+              @click="handleAdd(2,scope.row)"
             >
               新增</el-button
             >
@@ -62,6 +62,60 @@
         </el-table-column>
       </el-table>
     </div>
+    <!-- 模态框  -->
+    <el-dialog
+    v-model="showModal"
+    title="新增用户"
+    width="60%"
+    :show-close="false">
+      <el-form ref="dialogForm" 
+        :model="menuForm" 
+        :rules="rules"
+        label-width="120px">
+        <el-form-item label="父集菜单" prop="parentId">
+          <el-cascader v-model="menuForm.parentId"
+            :options="menuList"
+            :props="{ checkStrictly: true, value: '_id', label: 'menuName' }"
+            clearable>
+          </el-cascader>
+        </el-form-item>
+        <el-form-item label="菜单类型" prop="menuType">
+          <el-radio-group v-model="menuForm.menuType">
+            <el-radio label="1">菜单</el-radio>
+            <el-radio label="2">按钮</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item label="菜单名称" prop="menuName">
+          <el-input v-model="menuForm.menuName" placeholder="请输入菜单名称" />
+        </el-form-item>
+        <el-form-item label="菜单图标" prop="icon">
+          <el-input v-model="menuForm.icon" placeholder="请输入菜单图标"/>
+        </el-form-item>
+        <el-form-item label="路由地址" prop="path">
+          <el-input v-model="menuForm.path" placeholder="请输入路由地址"/>
+        </el-form-item>
+        <el-form-item label="权限标识" prop="menuCode">
+          <el-input v-model="menuForm.menuCode" placeholder="请输入权限标识"/>
+        </el-form-item>
+        <el-form-item label="组件路径" prop="component">
+          <el-input v-model="menuForm.component" placeholder="请输入组件路径"/>
+        </el-form-item>
+        <el-form-item label="菜单类型" prop="menuState">
+          <el-radio-group v-model="menuForm.menuState">
+            <el-radio label="1">正常</el-radio>
+            <el-radio label="2">停用</el-radio>
+          </el-radio-group>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="handleClose">取 消</el-button>
+          <el-button type="primary" @click="handleSubmit">确 定</el-button>
+        </span>
+      </template>
+    </el-dialog>
+
+
   </div>
 </template>
 
@@ -126,6 +180,21 @@ export default {
           }
         },
       ],
+      showModal:false,
+      menuForm:{
+        parentId:"",
+        menuType:"",
+        menuName:"",
+        icon:"",
+        path:"",
+        menuCode:"",
+        component:"",
+        roleList:"",
+        deptId:"",
+        menuState:""
+      },
+      action:""
+
     };
   },
   mounted(){
@@ -147,7 +216,15 @@ export default {
     // 重置
     handleReset() {},
     // 新增
-    handleAdd() {},
+    handleAdd(type,row) {
+      this.showModal = true;
+      this.action = "add"
+      if(type === 1){
+
+      }else{
+        this.menuForm.parentId = [...row.parentId,row._id].filter((item)=>item)
+      }
+    },
     // 编辑
     handleEdit() {},
     // 删除
