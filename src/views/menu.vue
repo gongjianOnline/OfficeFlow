@@ -75,35 +75,38 @@
         <el-form-item label="父集菜单" prop="parentId">
           <el-cascader v-model="menuForm.parentId"
             :options="menuList"
+            placeholder="请选择父集菜单"
             :props="{ checkStrictly: true, value: '_id', label: 'menuName' }"
             clearable>
           </el-cascader>
         </el-form-item>
         <el-form-item label="菜单类型" prop="menuType">
           <el-radio-group v-model="menuForm.menuType">
-            <el-radio label="1">菜单</el-radio>
-            <el-radio label="2">按钮</el-radio>
+            <el-radio :label="1">菜单</el-radio>
+            <el-radio :label="2">按钮</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="菜单名称" prop="menuName">
+        <el-form-item label="菜单名称" prop="menuName" >
           <el-input v-model="menuForm.menuName" placeholder="请输入菜单名称" />
         </el-form-item>
-        <el-form-item label="菜单图标" prop="icon">
+        <el-form-item label="菜单图标" prop="icon" v-show="menuForm.menuType === 1">
           <el-input v-model="menuForm.icon" placeholder="请输入菜单图标"/>
         </el-form-item>
-        <el-form-item label="路由地址" prop="path">
+        <el-form-item label="路由地址" prop="path" v-show="menuForm.menuType === 1">
           <el-input v-model="menuForm.path" placeholder="请输入路由地址"/>
         </el-form-item>
-        <el-form-item label="权限标识" prop="menuCode">
+        <el-form-item label="权限标识" 
+          prop="menuCode"  
+          v-show="menuForm.menuType === 2">
           <el-input v-model="menuForm.menuCode" placeholder="请输入权限标识"/>
         </el-form-item>
-        <el-form-item label="组件路径" prop="component">
+        <el-form-item label="组件路径" prop="component" v-show="menuForm.menuType === 1">
           <el-input v-model="menuForm.component" placeholder="请输入组件路径"/>
         </el-form-item>
-        <el-form-item label="菜单类型" prop="menuState">
+        <el-form-item label="菜单类型" prop="menuState" v-show="menuForm.menuType === 1">
           <el-radio-group v-model="menuForm.menuState">
-            <el-radio label="1">正常</el-radio>
-            <el-radio label="2">停用</el-radio>
+            <el-radio :label="1">正常</el-radio>
+            <el-radio :label="2">停用</el-radio>
           </el-radio-group>
         </el-form-item>
       </el-form>
@@ -183,7 +186,7 @@ export default {
       showModal:false,
       menuForm:{
         parentId:"",
-        menuType:"",
+        menuType:1,
         menuName:"",
         icon:"",
         path:"",
@@ -191,10 +194,15 @@ export default {
         component:"",
         roleList:"",
         deptId:"",
-        menuState:""
+        menuState:1
       },
-      action:""
-
+      action:"",
+      rules:{
+        menuName:[
+          {required:"true",messae:"请输入菜单名称",trigger:['blur']},
+          {min:2,max:10,messae:"长度在2-8个字符",trigger:['blur']},
+        ]
+      }
     };
   },
   mounted(){
@@ -212,9 +220,13 @@ export default {
       this.menuList = response
     },
     //查询
-    handleQuery() {},
+    handleQuery() {
+      this.getMenuList()
+    },
     // 重置
-    handleReset() {},
+    handleReset(form) {
+      this.$refs[form].resetFields()
+    },
     // 新增
     handleAdd(type,row) {
       this.showModal = true;
@@ -229,6 +241,29 @@ export default {
     handleEdit() {},
     // 删除
     handleDelect() {},
+    // 取消
+    handleClose(){
+      this.showModal = false
+    },
+    // 增加
+    handleSubmit(){
+      this.$refs.dialogForm.validate(async (vaild)=>{
+        if(vaild){
+          let {action,menuForm} = this;
+          let params = {...menuForm,action}
+          let response = await this.$request({
+            method:"post",
+            url:"/menu/operate",
+            data:params
+          })
+          console.log("增加测试",response)
+          this.showModal = false;
+          this.$message.success("操作成功")
+          this.handleReset("dialogForm")
+          this.getMenuList()
+        }
+      })
+    },
   },
 };
 </script>
