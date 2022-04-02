@@ -47,14 +47,14 @@
             <el-button
               size="small"
               type="primary"
-              @click="handleEdit(scope.$index, scope.row)"
+              @click="handleEdit(scope.row)"
             >
               编辑</el-button
             >
             <el-button
               size="small"
               type="danger"
-              @click="handleDelect(scope.$index, scope.row)"
+              @click="handleDelect(scope.row._id)"
             >
               删除</el-button
             >
@@ -185,7 +185,7 @@ export default {
       ],
       showModal:false,
       menuForm:{
-        parentId:"",
+        parentId:[null],
         menuType:1,
         menuName:"",
         icon:"",
@@ -216,7 +216,6 @@ export default {
         url:"/menu/list",
         data:this.queryForm
       })
-      console.log("菜单列表",response)
       this.menuList = response
     },
     //查询
@@ -231,19 +230,40 @@ export default {
     handleAdd(type,row) {
       this.showModal = true;
       this.action = "add"
-      if(type === 1){
-
-      }else{
-        this.menuForm.parentId = [...row.parentId,row._id].filter((item)=>item)
+      if(type===2){
+        this.menuForm.parentId = [...row.parentId, row._id].filter(
+          (item) => item
+        );
       }
     },
     // 编辑
-    handleEdit() {},
+    handleEdit(row) {
+      this.showModal = true;
+      this.action = "edit";
+      this.$nextTick(()=>{
+        this.menuForm = row
+        this.menuForm.parentId = [...row.parentId, row._id].filter(
+          (item) => item
+        );
+      })
+    },
     // 删除
-    handleDelect() {},
+    async handleDelect(id) {
+      let response = await this.$request({
+        method:"post",
+        url:"/menu/operate",
+        data:{
+          id,
+          action:"delete"
+        }
+      })
+      this.$message.success("删除成功")
+      this.getMenuList()
+    },
     // 取消
     handleClose(){
-      this.showModal = false
+      this.showModal = false;
+      this.handleReset("dialogForm")
     },
     // 增加
     handleSubmit(){
@@ -256,7 +276,6 @@ export default {
             url:"/menu/operate",
             data:params
           })
-          console.log("增加测试",response)
           this.showModal = false;
           this.$message.success("操作成功")
           this.handleReset("dialogForm")
