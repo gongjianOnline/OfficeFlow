@@ -214,8 +214,10 @@ export default {
       let response = await this.$request({
         method:"get",
         url:"/menu/list",
-        data:this.queryForm
+        data:this.queryForm,
+        mock:false
       })
+      console.log("xxx",response)
       this.menuList = response
     },
     //查询
@@ -255,7 +257,8 @@ export default {
         data:{
           id,
           action:"delete"
-        }
+        },
+        mock:false
       })
       this.$message.success("删除成功")
       this.getMenuList()
@@ -274,7 +277,8 @@ export default {
           let response = await this.$request({
             method:"post",
             url:"/menu/operate",
-            data:params
+            data:params,
+            mock:false
           })
           this.showModal = false;
           this.$message.success("操作成功")
