@@ -15,7 +15,7 @@
     </div>
     <div class="base-table">
       <div class="action">
-        <el-button type="primary" @click="handleAdd(1)">新增</el-button>
+        <el-button type="primary" @click="handleAdd()">创建</el-button>
       </div>
       <el-table
         :data="RoleList"
@@ -32,7 +32,12 @@
         />
         <el-table-column label="操作" width="280">
           <template #default="scope">
-            <el-button size="small" type="primary">编辑</el-button>
+            <el-button
+              size="small"
+              type="primary"
+              @click="handleEdit(scope.row)"
+              >编辑</el-button
+            >
             <el-button size="small" type="primary">设置权限</el-button>
             <el-button
               size="small"
@@ -64,66 +69,23 @@
     >
       <el-form
         ref="dialogForm"
-        :model="menuForm"
+        :model="roleForm"
         :rules="rules"
         label-width="120px"
       >
-        <el-form-item label="父集菜单" prop="parentId">
-          <el-cascader
-            v-model="menuForm.parentId"
-            :options="menuList"
-            placeholder="请选择父集菜单"
-            :props="{ checkStrictly: true, value: '_id', label: 'menuName' }"
-            clearable
-          >
-          </el-cascader>
+        <el-form-item label="父集菜单" prop="roleName">
+          <el-input
+            v-model="roleForm.roleName"
+            placeholder="请输入角色名称"
+          ></el-input>
         </el-form-item>
-        <el-form-item label="菜单类型" prop="menuType">
-          <el-radio-group v-model="menuForm.menuType">
-            <el-radio :label="1">菜单</el-radio>
-            <el-radio :label="2">按钮</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item label="菜单名称" prop="menuName">
-          <el-input v-model="menuForm.menuName" placeholder="请输入菜单名称" />
-        </el-form-item>
-        <el-form-item
-          label="菜单图标"
-          prop="icon"
-          v-show="menuForm.menuType === 1"
-        >
-          <el-input v-model="menuForm.icon" placeholder="请输入菜单图标" />
-        </el-form-item>
-        <el-form-item
-          label="路由地址"
-          prop="path"
-          v-show="menuForm.menuType === 1"
-        >
-          <el-input v-model="menuForm.path" placeholder="请输入路由地址" />
-        </el-form-item>
-        <el-form-item
-          label="权限标识"
-          prop="menuCode"
-          v-show="menuForm.menuType === 2"
-        >
-          <el-input v-model="menuForm.menuCode" placeholder="请输入权限标识" />
-        </el-form-item>
-        <el-form-item
-          label="组件路径"
-          prop="component"
-          v-show="menuForm.menuType === 1"
-        >
-          <el-input v-model="menuForm.component" placeholder="请输入组件路径" />
-        </el-form-item>
-        <el-form-item
-          label="菜单类型"
-          prop="menuState"
-          v-show="menuForm.menuType === 1"
-        >
-          <el-radio-group v-model="menuForm.menuState">
-            <el-radio :label="1">正常</el-radio>
-            <el-radio :label="2">停用</el-radio>
-          </el-radio-group>
+        <el-form-item label="备注" prop="remark">
+          <el-input
+            type="textarea"
+            :row="2"
+            v-model="roleForm.remark"
+            placeholder="请输入备注"
+          ></el-input>
         </el-form-item>
       </el-form>
       <template #footer>
@@ -172,6 +134,14 @@ export default {
         },
       ],
       showModal: false,
+      roleForm: {
+        roleName: "",
+        remark: "",
+      },
+      rules: {
+        roleName: [{ required: true, message: "请输入角色名称" }],
+      },
+      action: "edit",
     };
   },
   mounted() {
@@ -185,7 +155,6 @@ export default {
         url: "/roles/list",
         data: this.queryForm,
       });
-      console.log("xxx", response);
       this.RoleList = response.list;
       this.pager.total = response.page.total;
     },
@@ -197,65 +166,61 @@ export default {
     handleReset(form) {
       this.$refs[form].resetFields();
     },
-    // 新增
-    handleAdd(type, row) {
+    // 创建
+    async handleAdd() {
       this.showModal = true;
-      this.action = "add";
-      if (type === 2) {
-        this.menuForm.parentId = [...row.parentId, row._id].filter(
-          (item) => item
-        );
-      }
+      this.action = "create";
     },
     // 编辑
     handleEdit(row) {
-      this.showModal = true;
       this.action = "edit";
+      this.showModal = true;
       this.$nextTick(() => {
-        this.menuForm = row;
-        this.menuForm.parentId = [...row.parentId, row._id].filter(
-          (item) => item
-        );
+        this.roleForm = row;
       });
     },
     // 删除
     async handleDelect(id) {
       let response = await this.$request({
         method: "post",
-        url: "/menu/operate",
+        url: "/roles/operate",
         data: {
           id,
-          action: "delete",
+          action:"delete"
         },
-        mock: false,
       });
-      this.$message.success("删除成功");
-      this.getMenuList();
+      if (response) {
+        this.$message.success("删除成功成功");
+        this.getRoleList();
+      }
     },
     // 取消
     handleClose() {
       this.showModal = false;
       this.handleReset("dialogForm");
     },
-    // 增加
+    // 模态框提交
     handleSubmit() {
       this.$refs.dialogForm.validate(async (vaild) => {
         if (vaild) {
-          let { action, menuForm } = this;
-          let params = { ...menuForm, action };
+          let { action, roleForm } = this;
+          let params = { action, ...roleForm };
           let response = await this.$request({
             method: "post",
-            url: "/menu/operate",
+            url: "/roles/operate",
             data: params,
-            mock: false,
           });
-          this.showModal = false;
-          this.$message.success("操作成功");
-          this.handleReset("dialogForm");
-          this.getMenuList();
+          if (response) {
+            this.showModal = false;
+            this.$message.success("创建成功");
+            this.handleReset("dialogForm");
+            this.getRoleList();
+          }
         }
       });
     },
+    // 分页时事件
+    handelCurrentChange() {},
   },
 };
 </script>
