@@ -217,7 +217,6 @@ export default {
         data:this.queryForm,
         mock:false
       })
-      console.log("xxx",response)
       this.menuList = response
     },
     //查询

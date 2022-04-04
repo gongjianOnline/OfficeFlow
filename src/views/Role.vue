@@ -38,7 +38,7 @@
               @click="handleEdit(scope.row)"
               >编辑</el-button
             >
-            <el-button size="small" type="primary">设置权限</el-button>
+            <el-button size="small" type="primary" @click="handleOpenPermission(scope.row)">设置权限</el-button>
             <el-button
               size="small"
               type="danger"
@@ -95,6 +95,35 @@
         </span>
       </template>
     </el-dialog>
+    <!-- 权限表单 -->
+    <el-dialog
+      v-model="showPermission"
+      title="权限设置"
+      width="60%"
+      :show-close="false"
+    >
+      <el-form label-width="120px">
+        <el-form-item label="角色名称" >
+          {{curRoleName}}
+        </el-form-item>
+        <el-form-item label="选择权限">
+          <el-tree
+            ref="permissionTree"
+            :data="menuList"
+            :props="props"
+            node-key="_id"
+            default-expand-all
+            show-checkbox
+          />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="showPermission=false">取 消</el-button>
+          <el-button type="primary" @click="handlePermisstionSubmit">确 定</el-button>
+        </span>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -142,13 +171,23 @@ export default {
         roleName: [{ required: true, message: "请输入角色名称" }],
       },
       action: "edit",
+      // 权限展示
+      showPermission:false,
+      curRoleId:"",
+      curRoleName:"",
+      menuList:[],
+      props:{
+        children: 'children',
+        label: 'menuName',
+      }
     };
   },
   mounted() {
     this.getRoleList();
+    this.getMenuList()
   },
   methods: {
-    // 获取菜单栏列表
+    // 获取角色列表
     async getRoleList() {
       let response = await this.$request({
         method: "get",
@@ -158,6 +197,16 @@ export default {
       this.RoleList = response.list;
       this.pager.total = response.page.total;
     },
+    // 获取菜单列表
+    async getMenuList(){
+      let response = await this.$request({
+        method:"get",
+        url:"/menu/list",
+        data:this.queryForm,
+        mock:true
+      })
+      this.menuList = response
+    },  
     //查询
     handleQuery() {
       this.getMenuList();
@@ -221,6 +270,46 @@ export default {
     },
     // 分页时事件
     handelCurrentChange() {},
+    // 设置权限弹窗
+    handleOpenPermission(row){
+      this.showPermission = true;
+      this.curRoleId = row._id;
+      this.curRoleName = row.roleName;
+      let {checkedKeys} = row.permissionList;
+      setTimeout(()=>{
+        this.$refs.permissionTree.setCheckedKeys(checkedKeys)
+      },0)
+    },
+    // 权限弹窗提交
+    async handlePermisstionSubmit(){
+      let nodes = this.$refs.permissionTree.getCheckedNodes();
+      let halfKeys = this.$refs.permissionTree.getHalfCheckedKeys();
+      let checkedKeys = [];
+      let parentKeys = [];
+      nodes.map((node)=>{
+        if(!node.children){
+          checkedKeys.push(node._id)
+        }else{
+          parentKeys.push(node._id)
+        }
+      })
+      let params = {
+        _id:this.curRoleId,
+        permissionList:{
+          checkedKeys:[],
+          halfCheckedKeys:parentKeys.concat(halfKeys)
+        }
+      }
+      let response = await this.$request({
+        method:"post",
+        url:'/roles/update/permission',
+        data:params
+      })
+      this.showPermission = false;
+      this.$message.success("操作成功")
+      this.getRoleList()
+    }
+
   },
 };
 </script>
