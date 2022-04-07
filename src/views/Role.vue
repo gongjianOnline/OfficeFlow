@@ -139,6 +139,7 @@ export default {
       RoleList: [],
       pager: {
         total: 0,
+        pageNum:1,
         pageSize: 10,
       },
       colums: [
@@ -157,11 +158,13 @@ export default {
             let names = [];
             let list = value.halfCheckedKeys || []
             list.map(key=>{
-              if(key){
-                names.push(this.actionMap[key])
+              let name = this.actionMap[key]
+              if(key&&name){
+                names.push(name)
               }
               return names.join(',')
             })
+            return names
           }
         },
         {
@@ -204,10 +207,14 @@ export default {
       let response = await this.$request({
         method: "get",
         url: "/roles/list",
-        data: this.queryForm,
+        data: {
+          ...this.queryForm,
+          ...this.pager
+        },
+        mock:false
       });
       this.RoleList = response.list;
-      this.pager.total = response.page.total;
+      this.pager.total = response?.page?.total || 0;
     },
     // 获取菜单列表
     async getMenuList(){
@@ -215,7 +222,7 @@ export default {
         method:"get",
         url:"/menu/list",
         data:this.queryForm,
-        mock:true
+        mock:false
       })
       this.getActionMap(response)
       this.menuList = response
@@ -238,23 +245,22 @@ export default {
       this.action = "edit";
       this.showModal = true;
       this.$nextTick(() => {
-        this.roleForm = row;
+        this.roleForm = {remark:row.remark,roleName:row.roleName,_id:row._id};
       });
     },
     // 删除
-    async handleDelect(id) {
+    async handleDelect(_id) {
       let response = await this.$request({
         method: "post",
         url: "/roles/operate",
         data: {
-          id,
+          _id,
           action:"delete"
         },
+        mock:false
       });
-      if (response) {
-        this.$message.success("删除成功成功");
-        this.getRoleList();
-      }
+      this.$message.success("删除成功");
+      this.getRoleList();
     },
     // 取消
     handleClose() {
@@ -271,18 +277,20 @@ export default {
             method: "post",
             url: "/roles/operate",
             data: params,
+            mock:false
           });
-          if (response) {
-            this.showModal = false;
-            this.$message.success("创建成功");
-            this.handleReset("dialogForm");
-            this.getRoleList();
-          }
+          this.showModal = false;
+          this.$message.success("创建成功");
+          this.handleReset("dialogForm");
+          this.getRoleList();
         }
       });
     },
     // 分页时事件
-    handelCurrentChange() {},
+    handelCurrentChange(current) {
+      this.pager.pageNum = current;
+      this.getRoleList()
+    },
     // 设置权限弹窗
     handleOpenPermission(row){
       this.showPermission = true;
@@ -316,7 +324,8 @@ export default {
       let response = await this.$request({
         method:"post",
         url:'/roles/update/permission',
-        data:params
+        data:params,
+        mock:false
       })
       this.showPermission = false;
       this.$message.success("操作成功")
@@ -328,10 +337,11 @@ export default {
       const deep = (arr)=>{
           for(let i=0;i<arr.length;i++){
             let item = arr[i];
-            if(item.children && item.action){
+            if(!item.children){
               actionMap[item._id] = item.menuName
             }
-            if(item.children && !item.action){
+            if(item.children){
+              actionMap[item._id] = item.menuName
               deep(item.children)
             }
           }

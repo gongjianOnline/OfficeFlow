@@ -354,7 +354,8 @@ export default{
     const getRoleList = async ()=>{
       let response = await proxy.$request({
         method:'get',
-        url:'/roles/allList'
+        url:'/roles/allList',
+        mock:false
       })
       roleList.value = response
     }
