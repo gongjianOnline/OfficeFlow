@@ -152,7 +152,17 @@ export default {
         },
         {
           label: "权限列表",
-          prop: "menuType",
+          prop: "permissionList",
+          formatter:(row,column,value)=>{
+            let names = [];
+            let list = value.halfCheckedKeys || []
+            list.map(key=>{
+              if(key){
+                names.push(this.actionMap[key])
+              }
+              return names.join(',')
+            })
+          }
         },
         {
           label: "创建时间",
@@ -179,7 +189,9 @@ export default {
       props:{
         children: 'children',
         label: 'menuName',
-      }
+      },
+      // 角色表映射
+      actionMap:{}
     };
   },
   mounted() {
@@ -205,6 +217,7 @@ export default {
         data:this.queryForm,
         mock:true
       })
+      this.getActionMap(response)
       this.menuList = response
     },  
     //查询
@@ -308,6 +321,23 @@ export default {
       this.showPermission = false;
       this.$message.success("操作成功")
       this.getRoleList()
+    },
+    // 映射角色列表的id
+    getActionMap(list){
+      let actionMap = {};
+      const deep = (arr)=>{
+          for(let i=0;i<arr.length;i++){
+            let item = arr[i];
+            if(item.children && item.action){
+              actionMap[item._id] = item.menuName
+            }
+            if(item.children && !item.action){
+              deep(item.children)
+            }
+          }
+      }
+      deep(list)
+      this.actionMap = actionMap
     }
 
   },
