@@ -5,6 +5,7 @@ const Login = ()=>import("../views/Login.vue")
 const User = ()=>import("../views/user.vue")
 const Menu = ()=>import("../views/menu.vue")
 const Role = ()=>import("../views/Role.vue")
+const Dept = ()=>import("../views/Dept.vue")
 
 const routes = [
   {
@@ -55,7 +56,16 @@ const routes = [
         },
         path:"system/role",
         component:Role,
-      }
+      },
+      {
+        name:"dept",
+        meta:{
+          title:"部门管理"
+        },
+        path:"system/dept",
+        component:Dept,
+      },
+      
       
     ]
   }
