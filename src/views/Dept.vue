@@ -94,7 +94,7 @@ export default {
   data(){
     return {
       queryForm:{
-        deptName:""
+        // deptName:""
       },
       depList:[],
       columns:[
@@ -115,14 +115,10 @@ export default {
           prop:"createTime"
         }
       ],
-      pager:{
-        pageNum:1,
-        pageSize:10
-      },
       action:"create",
       showModal:false,
       deptForm:{
-        parentId:[],
+        parentId:[null],
         deptName:"",
         user:"",
         userEmail:"",
@@ -152,9 +148,9 @@ export default {
         method:"get",
         url:"/dept/list",
         data:{
-          ...this.queryForm,
-          ...this.pager
-        }
+          ...this.queryForm
+        },
+        mock:false
       })
       this.depList = response
     },
@@ -162,9 +158,10 @@ export default {
     async getUserList(){
       let response = await this.$request({
         method:"get",
-        url:'/users/all/list'
+        url:'/users/all/list',
+        mock:false
       })
-      this.userList = response.list
+      this.userList = response
     },
     // 重置表单
     handleReset(form){
@@ -196,7 +193,8 @@ export default {
         data:{
           _id,
           action:this.action
-        }
+        },
+        mock:false
       })
       this.$message.success("删除成功")
       this.handleClose()
@@ -216,7 +214,8 @@ export default {
           let res = await this.$request({
             method:"post",
             url:"/dept/operate",
-            data:params
+            data:params,
+            mock:false
           })
           this.showModal = false;
           this.$message.success("操作成功")
