@@ -93,12 +93,14 @@ export default {
     // 获取动态菜单
     async getMenuList(){
       let response = await this.$request({
-        url:'/menu/list',
+        // url:'/menu/list',
+        url:'/users/getPermissionList',
         method:"get",
-        data:{}
+        data:{},
+        mock:false
       })
       this.userMenu = response
-    }
+    },
   }
 
 }
