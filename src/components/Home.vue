@@ -99,7 +99,9 @@ export default {
         data:{},
         mock:false
       })
-      this.userMenu = response
+      this.$store.commit("saveUserMenu",response.menuList)
+      this.$store.commit("saveUserAction",response.actionList)
+      this.userMenu = response.menuList
     },
   }
 
