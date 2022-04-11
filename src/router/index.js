@@ -6,6 +6,7 @@ const User = ()=>import("../views/user.vue")
 const Menu = ()=>import("../views/menu.vue")
 const Role = ()=>import("../views/Role.vue")
 const Dept = ()=>import("../views/Dept.vue")
+const ErrorPage = ()=>import("../views/404.vue")
 
 const routes = [
   {
@@ -15,6 +16,14 @@ const routes = [
     },
     path:"/login",
     component:Login,
+  },
+  {
+    name:"404",
+    meta:{
+      title:"页面不存在"
+    },
+    path:"/404",
+    component:ErrorPage,
   },
   {
     name:"home",
