@@ -42,38 +42,38 @@ const routes = [
         path:"welcome",
         component:Welcome,
       },
-      {
-        name:"user",
-        meta:{
-          title:"用户管理"
-        },
-        path:"system/user",
-        component:User,
-      },
-      {
-        name:"menu",
-        meta:{
-          title:"菜单管理"
-        },
-        path:"system/menu",
-        component:Menu,
-      },
-      {
-        name:"role",
-        meta:{
-          title:"角色管理"
-        },
-        path:"system/role",
-        component:Role,
-      },
-      {
-        name:"dept",
-        meta:{
-          title:"部门管理"
-        },
-        path:"system/dept",
-        component:Dept,
-      },
+      // {
+      //   name:"user",
+      //   meta:{
+      //     title:"用户管理"
+      //   },
+      //   path:"system/user",
+      //   component:User,
+      // },
+      // {
+      //   name:"menu",
+      //   meta:{
+      //     title:"菜单管理"
+      //   },
+      //   path:"system/menu",
+      //   component:Menu,
+      // },
+      // {
+      //   name:"role",
+      //   meta:{
+      //     title:"角色管理"
+      //   },
+      //   path:"system/role",
+      //   component:Role,
+      // },
+      // {
+      //   name:"dept",
+      //   meta:{
+      //     title:"部门管理"
+      //   },
+      //   path:"system/dept",
+      //   component:Dept,
+      // },
       
       
     ]
@@ -84,5 +84,25 @@ const router = createRouter({
   history:createWebHashHistory(),
   routes
 })
+
+function checkPermission(path){
+  let hasPermission = router.getRoutes().filter(route=>route.path === path).length;
+  if(hasPermission){
+    return true
+  }else{
+    false
+  }
+}
+// 导航守卫
+router.beforeEach((to,form,next)=>{
+  if(checkPermission(to.path)){
+    document.title = to.title
+    next()
+  }else{
+    next("/404")
+  }
+})
+
+
 
 export default router
