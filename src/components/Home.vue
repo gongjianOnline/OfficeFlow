@@ -97,7 +97,7 @@ export default {
         url:'/users/getPermissionList',
         method:"get",
         data:{},
-        // mock:false
+        mock:false
       })
       this.$store.commit("saveUserMenu",response.menuList)
       this.$store.commit("saveUserAction",response.actionList)
