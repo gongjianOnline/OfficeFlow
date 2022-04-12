@@ -38,7 +38,12 @@
               @click="handleEdit(scope.row)"
               >编辑</el-button
             >
-            <el-button size="small" type="primary" @click="handleOpenPermission(scope.row)">设置权限</el-button>
+            <el-button
+              size="small"
+              type="primary"
+              @click="handleOpenPermission(scope.row)"
+              >设置权限</el-button
+            >
             <el-button
               size="small"
               type="danger"
@@ -103,8 +108,8 @@
       :show-close="false"
     >
       <el-form label-width="120px">
-        <el-form-item label="角色名称" >
-          {{curRoleName}}
+        <el-form-item label="角色名称">
+          {{ curRoleName }}
         </el-form-item>
         <el-form-item label="选择权限">
           <el-tree
@@ -119,8 +124,10 @@
       </el-form>
       <template #footer>
         <span class="dialog-footer">
-          <el-button @click="showPermission=false">取 消</el-button>
-          <el-button type="primary" @click="handlePermisstionSubmit">确 定</el-button>
+          <el-button @click="showPermission = false">取 消</el-button>
+          <el-button type="primary" @click="handlePermisstionSubmit"
+            >确 定</el-button
+          >
         </span>
       </template>
     </el-dialog>
@@ -139,7 +146,7 @@ export default {
       RoleList: [],
       pager: {
         total: 0,
-        pageNum:1,
+        pageNum: 1,
         pageSize: 10,
       },
       colums: [
@@ -154,18 +161,15 @@ export default {
         {
           label: "权限列表",
           prop: "permissionList",
-          formatter:(row,column,value)=>{
+          formatter: (row, column, value) => {
             let names = [];
-            let list = value.halfCheckedKeys || []
-            list.map(key=>{
-              let name = this.actionMap[key]
-              if(key&&name){
-                names.push(name)
-              }
-              return names.join(',')
-            })
-            return names
-          }
+            let list = value.halfCheckedKeys || [];
+            list.map((key) => {
+              let name = this.actionMap[key];
+              if (key && name) names.push(name);
+            });
+            return names.join(",");
+          },
         },
         {
           label: "创建时间",
@@ -185,21 +189,21 @@ export default {
       },
       action: "edit",
       // 权限展示
-      showPermission:false,
-      curRoleId:"",
-      curRoleName:"",
-      menuList:[],
-      props:{
-        children: 'children',
-        label: 'menuName',
+      showPermission: false,
+      curRoleId: "",
+      curRoleName: "",
+      menuList: [],
+      props: {
+        children: "children",
+        label: "menuName",
       },
       // 角色表映射
-      actionMap:{}
+      actionMap: {},
     };
   },
   mounted() {
     this.getRoleList();
-    this.getMenuList()
+    this.getMenuList();
   },
   methods: {
     // 获取角色列表
@@ -209,24 +213,24 @@ export default {
         url: "/roles/list",
         data: {
           ...this.queryForm,
-          ...this.pager
+          ...this.pager,
         },
-        mock:false
+        mock: false,
       });
       this.RoleList = response.list;
       this.pager.total = response?.page?.total || 0;
     },
     // 获取菜单列表
-    async getMenuList(){
+    async getMenuList() {
       let response = await this.$request({
-        method:"get",
-        url:"/menu/list",
-        data:this.queryForm,
-        mock:false
-      })
-      this.getActionMap(response)
-      this.menuList = response
-    },  
+        method: "get",
+        url: "/menu/list",
+        data: this.queryForm,
+        mock: false,
+      });
+      this.getActionMap(response);
+      this.menuList = response;
+    },
     //查询
     handleQuery() {
       this.getMenuList();
@@ -245,7 +249,11 @@ export default {
       this.action = "edit";
       this.showModal = true;
       this.$nextTick(() => {
-        this.roleForm = {remark:row.remark,roleName:row.roleName,_id:row._id};
+        this.roleForm = {
+          remark: row.remark,
+          roleName: row.roleName,
+          _id: row._id,
+        };
       });
     },
     // 删除
@@ -255,9 +263,9 @@ export default {
         url: "/roles/operate",
         data: {
           _id,
-          action:"delete"
+          action: "delete",
         },
-        mock:false
+        mock: false,
       });
       this.$message.success("删除成功");
       this.getRoleList();
@@ -277,7 +285,7 @@ export default {
             method: "post",
             url: "/roles/operate",
             data: params,
-            mock:false
+            mock: false,
           });
           this.showModal = false;
           this.$message.success("创建成功");
@@ -289,67 +297,65 @@ export default {
     // 分页时事件
     handelCurrentChange(current) {
       this.pager.pageNum = current;
-      this.getRoleList()
+      this.getRoleList();
     },
     // 设置权限弹窗
-    handleOpenPermission(row){
+    handleOpenPermission(row) {
       this.showPermission = true;
       this.curRoleId = row._id;
       this.curRoleName = row.roleName;
-      let {checkedKeys} = row.permissionList;
-      setTimeout(()=>{
-        this.$refs.permissionTree.setCheckedKeys(checkedKeys)
-      },0)
+      let { checkedKeys } = row.permissionList;
+      setTimeout(() => {
+        this.$refs.permissionTree.setCheckedKeys(checkedKeys);
+      }, 0);
     },
     // 权限弹窗提交
-    async handlePermisstionSubmit(){
+    async handlePermisstionSubmit() {
       let nodes = this.$refs.permissionTree.getCheckedNodes();
       let halfKeys = this.$refs.permissionTree.getHalfCheckedKeys();
       let checkedKeys = [];
       let parentKeys = [];
-      nodes.map((node)=>{
-        if(!node.children){
-          checkedKeys.push(node._id)
-        }else{
-          parentKeys.push(node._id)
+      nodes.map((node) => {
+        if (!node.children) {
+          checkedKeys.push(node._id);
+        } else {
+          parentKeys.push(node._id);
         }
-      })
+      });
       let params = {
-        _id:this.curRoleId,
-        permissionList:{
-          checkedKeys:[],
-          halfCheckedKeys:parentKeys.concat(halfKeys)
-        }
-      }
+        _id: this.curRoleId,
+        permissionList: {
+          checkedKeys: [],
+          halfCheckedKeys: parentKeys.concat(halfKeys),
+        },
+      };
       let response = await this.$request({
-        method:"post",
-        url:'/roles/update/permission',
-        data:params,
-        mock:false
-      })
+        method: "post",
+        url: "/roles/update/permission",
+        data: params,
+        mock: false,
+      });
       this.showPermission = false;
-      this.$message.success("操作成功")
-      this.getRoleList()
+      this.$message.success("操作成功");
+      this.getRoleList();
     },
     // 映射角色列表的id
-    getActionMap(list){
+    getActionMap(list) {
       let actionMap = {};
-      const deep = (arr)=>{
-          for(let i=0;i<arr.length;i++){
-            let item = arr[i];
-            if(!item.children){
-              actionMap[item._id] = item.menuName
-            }
-            if(item.children){
-              actionMap[item._id] = item.menuName
-              deep(item.children)
-            }
+      const deep = (arr) => {
+        while (arr.length) {
+          let item = arr.pop();
+          if (item.children && item.action) {
+            actionMap[item._id] = item.menuName;
           }
-      }
-      deep(list)
-      this.actionMap = actionMap
-    }
-
+          if (item.children && !item.action) {
+            deep(item.children);
+          }
+        }
+      };
+      deep(JSON.parse(JSON.stringify(list)));
+      this.actionMap = actionMap;
+    },
   },
 };
 </script>

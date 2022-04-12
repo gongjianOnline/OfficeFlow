@@ -249,12 +249,12 @@ export default {
       })
     },
     // 删除
-    async handleDelect(id) {
+    async handleDelect(_id) {
       let response = await this.$request({
         method:"post",
         url:"/menu/operate",
         data:{
-          id,
+          _id,
           action:"delete"
         },
         mock:false
@@ -267,7 +267,7 @@ export default {
       this.showModal = false;
       this.handleReset("dialogForm")
     },
-    // 增加
+    // 提交
     handleSubmit(){
       this.$refs.dialogForm.validate(async (vaild)=>{
         if(vaild){
