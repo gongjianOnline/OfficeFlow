@@ -23,4 +23,26 @@ export default {
     }
     return fmt;
   },
+  // 递归生成动态路由
+  generateRoute(menuList){
+    let routes = [];
+    let deepList = (list)=>{
+      while(list.length){
+        let item = list.pop();
+        if(item.action){
+          routes.push({
+            name:item.component,
+            path:item.path,
+            meta:{title:item.menuName},
+            component:item.component
+          })
+        }
+        if(item.children && !item.action){
+          deepList(item.children)
+        }
+      }
+    }
+    deepList(menuList)
+    return routes
+  }
 }
