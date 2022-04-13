@@ -1,15 +1,20 @@
 <template>
   <div class="user-manage">
     <div class="query-from">
-      <el-form ref="form" :inline="true" :model="user">
+      <el-form  ref="form" :inline="true" :model="user">
         <el-form-item label="用户ID" prop="userId">
-          <el-input v-model="user.userId" placeholder="请输入用户ID" />
+          <el-input 
+            v-model="user.userId" 
+            placeholder="请输入用户ID" />
         </el-form-item>
         <el-form-item label="用户名称" prop="userName">
-          <el-input v-model="user.userName" placeholder="请输入用户名称" />
+          <el-input 
+            v-model="user.userName" 
+            placeholder="请输入用户名称" />
         </el-form-item>
         <el-form-item label="用户状态" prop="state">
-          <el-select v-model="user.state" placeholder="请选择用户状态">
+          <el-select v-model="user.state" 
+            placeholder="请选择用户状态">
             <el-option label="所有" :value="0" />
             <el-option label="在职" :value="1" />
             <el-option label="离职" :value="2" />
@@ -27,64 +32,54 @@
         <el-button type="primary" @click="handleCreate">新增</el-button>
         <el-button type="danger" @click="handlePatchDele">批量删除</el-button>
       </div>
-      <el-table :data="userList" @selection-change="handleSelectionChange">
-        <el-table-column type="selection" width="55"></el-table-column>
+      <el-table :data="userList"
+        @selection-change="handleSelectionChange">
+        <el-table-column type="selection" 
+          width="55"></el-table-column>
         <el-table-column
           v-for="item in colums"
           :key="item.prop"
-          :prop="item.prop"
-          :label="item.label"
+          :prop="item.prop" 
+          :label="item.label" 
           :width="item.width"
-          :formatter="item.formatter"
-        />
+          :formatter="item.formatter" />
         <el-table-column label="操作" width="180">
           <template #default="scope">
-            <el-button
-              size="small"
+            <el-button size="small"
               type="primary"
-              @click="handleEdit(scope.$index, scope.row)"
-            >
-              编辑</el-button
-            >
-            <el-button
-              size="small"
+              @click="handleEdit(scope.$index, scope.row)">
+              编辑</el-button>
+            <el-button size="small"
               type="danger"
-              @click="handleDelect(scope.$index, scope.row)"
-            >
-              删除</el-button
-            >
+              @click="handleDelect(scope.$index, scope.row)">
+              删除</el-button>
           </template>
         </el-table-column>
       </el-table>
-      <div class="pagination">
-        <el-pagination
-          background
+      <div class="pagination"> 
+        <el-pagination background 
           :page-size="pager.pageSize"
           @current-change="handelCurrentChange"
-          layout="prev, pager, next"
-          :total="pager.total"
-        />
+          layout="prev, pager, next" 
+          :total="pager.total" />
       </div>
     </div>
 
     <!-- 新增模态框 -->
     <el-dialog
-      v-model="addUserDialog"
-      title="新增用户"
-      width="60%"
-      :show-close="false"
-    >
-      <el-form
-        ref="dialogForm"
-        :model="userForm"
+    v-model="addUserDialog"
+    title="新增用户"
+    width="60%"
+    :show-close="false">
+      <el-form ref="dialogForm" 
+        :model="userForm" 
         :rules="rules"
-        label-width="120px"
-      >
+        label-width="120px">
         <el-form-item label="用户名" prop="userName">
-          <el-input v-model="userForm.userName" :disabled="action == 'edit'" />
+          <el-input v-model="userForm.userName" :disabled="action=='edit'" />
         </el-form-item>
         <el-form-item label="邮箱" prop="userEmail">
-          <el-input v-model="userForm.userEmail" :disabled="action === 'edit'">
+          <el-input v-model="userForm.userEmail" :disabled="action==='edit'">
             <template #append>@imooc.com</template>
           </el-input>
         </el-form-item>
@@ -106,14 +101,11 @@
             v-model="userForm.roleList"
             placeholder="请选择用户系统角色"
             multiple
-            style="width: 100%"
-          >
-            <el-option
-              v-for="item in roleList"
+            style="width: 100%">
+            <el-option v-for="(item) in roleList"
               :key="item._id"
-              :label="item.roleName"
-              :value="item._id"
-            ></el-option>
+              :label="item.roleName" 
+              :value="item._id"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="部门" prop="deptId">
@@ -138,234 +130,236 @@
 </template>
 
 <script>
-import { getCurrentInstance, onMounted, reactive, ref, toRaw } from "vue";
-export default {
-  name: "user",
-  setup() {
+import {getCurrentInstance, onMounted,reactive,ref,toRaw} from "vue"
+export default{
+  name:"user",
+  setup(){
     // 获取 composition APi 全局上下文对象
-    const { proxy } = getCurrentInstance();
+    const {proxy} = getCurrentInstance()
     // 初始化用户表单对象
     const user = reactive({
-      userId: "",
-      userName: "",
-      state: 0,
-    });
+      userId:"",
+      userName:"",
+      state:0
+    })
     // 初始化用户列表数据
     const userList = ref([]);
     // 初始化动态表头格式
     const colums = reactive([
       {
-        label: "用户ID",
-        prop: "userId",
+        label:"用户ID",
+        prop:"userId"
       },
       {
-        label: "用户名称",
-        prop: "userName",
+        label:"用户名称",
+        prop:"userName"
       },
       {
-        label: "用户邮箱",
-        prop: "userEmail",
-        width: 180,
+        label:"用户邮箱",
+        prop:"userEmail",
+        width:180
       },
       {
-        label: "用户角色",
-        prop: "role",
-        formatter: (row, index, value) => {
-          switch (value) {
+        label:"用户角色",
+        prop:"role",
+        formatter:(row,index,value)=>{
+          switch(value){
             case "0":
-              return "系统管理员";
-            default:
-              return "普通用户";
+              return "系统管理员"
+            default: 
+              return "普通用户"
           }
-        },
+        }
       },
       {
-        label: "用户状态",
-        prop: "state",
-        formatter: (row, index, value) => {
-          switch (value) {
+        label:"用户状态",
+        prop:"state",
+        formatter:(row,index,value)=>{
+          switch(value){
             case 1:
-              return "在职";
+              return "在职"
             case 2:
-              return "离职";
-            default:
-              return "试用期";
+              return "离职"
+            default: 
+              return "试用期"
           }
-        },
+        }
       },
       {
-        label: "注册时间",
-        prop: "createTime",
-        width: 210,
+        label:"注册时间",
+        prop:"createTime",
+        width:210
+      },{
+        label:"最后登录时间",
+        prop:"lastLoginTime",
+        width:210
       },
-      {
-        label: "最后登录时间",
-        prop: "lastLoginTime",
-        width: 210,
-      },
-    ]);
+    ])
     // 初始化分页对象
     const pager = reactive({
-      pageNum: 1,
-      pageSize: 10,
-    });
+      pageNum:1,
+      pageSize:10
+    })
     // 初始化表格选中状态
-    const checkedUserIds = ref([]);
+    const checkedUserIds = ref([])
     // 初始化新增用户模态框状态
-    let addUserDialog = ref(false);
+    let addUserDialog = ref(false)
     // 新增用户表单验证
     const rules = reactive({
-      userName: [
-        { required: true, message: "用户名不能为空", trigger: "blur" },
+      userName:[
+        {required: true, message: '用户名不能为空', trigger: 'blur'}
       ],
-      userEmail: [{ required: true, message: "邮箱不能为空", trigger: "blur" }],
-      mobile: [
-        { required: true, message: "手机号不能为空", trigger: "blur" },
+      userEmail:[
+        {required: true, message: '邮箱不能为空', trigger: 'blur'},
+      ],
+      mobile:[
+        {required: true, message: '手机号不能为空', trigger: 'blur'},
         {
-          pattern:
-            /^[1](([3][0-9])|([4][5-9])|([5][0-3,5-9])|([6][5,6])|([7][0-8])|([8][0-9])|([9][1,8,9]))[0-9]{8}$/,
-          message: "手机格式不正确",
-          trigger: "blur",
-        },
+          pattern: /^[1](([3][0-9])|([4][5-9])|([5][0-3,5-9])|([6][5,6])|([7][0-8])|([8][0-9])|([9][1,8,9]))[0-9]{8}$/, 
+          message: '手机格式不正确', 
+          trigger: 'blur'}
       ],
-      deptId: [{ required: true, message: "部门不能为空", trigger: "blur" }],
-    });
+      deptId:[
+        {required: true, message: '部门不能为空', trigger: 'blur'},
+      ]
+    })
     // 新增用户表单
     const userForm = reactive({
-      state: 1,
-    });
+      state:1
+    })
     // 初始化用户列表
-    const roleList = ref([]);
+    const roleList = ref([])
     // 所属部门列表
-    const deptList = ref([]);
+    const deptList = ref([])
     // 创建和编辑状态
-    const action = ref("add");
+    const action = ref('add')
     // 查询事件
-    const handleQuery = () => {
-      getUserList();
-    };
+    const handleQuery = ()=>{
+      getUserList()
+    }
     // 重置事件
-    const handleReset = () => {
-      proxy.$refs.form.resetFields();
-    };
+    const handleReset = ()=>{
+      proxy.$refs.form.resetFields()
+    }
     // 编辑事件
-    const handleEdit = (index, row) => {
+    const handleEdit = (index,row)=>{
       action.value = "edit";
       addUserDialog.value = true;
-      proxy.$nextTick(() => {
-        Object.assign(userForm, row);
-      });
-    };
+      proxy.$nextTick(()=>{
+        Object.assign(userForm,row);
+      })
+    }
     // 删除事件
-    const handleDelect = async (index, row) => {
+    const handleDelect = async (index,row)=>{
       await proxy.$request({
-        method: "post",
-        url: "/users/delete",
-        data: {
-          userIds: [row.userId],
+        method:"post",
+        url:'/users/delete',
+        data:{
+          userIds:[row.userId]
         },
-        mock: false,
-      });
-      proxy.$message.success("删除成功");
-      getUserList();
-    };
+        mock:false
+      })
+      proxy.$message.success('删除成功')
+      getUserList()
+    }
     // 分页事件
-    const handelCurrentChange = (current) => {
+    const handelCurrentChange = (current)=>{
       pager.pageNum = current;
-      getUserList();
-    };
+      getUserList()
+    }
     // 批量删除
-    const handlePatchDele = async () => {
-      if (checkedUserIds.value.length > 0) {
+    const handlePatchDele = async ()=>{
+      if(checkedUserIds.value.length>0){
         let response = await proxy.$request({
-          method: "post",
-          url: "/users/delete",
-          data: {
-            userIds: checkedUserIds.value,
-          },
-        });
-        if (response.nModified > 0) {
-          proxy.$message.success("清除成功");
-          getUserList();
-        } else {
-          proxy.$message.error("清除失败");
+          method:"post",
+          url:'/users/delete',
+          data:{
+            userIds:checkedUserIds.value
+          }
+        })
+        if(response.nModified > 0){
+          proxy.$message.success("清除成功")
+          getUserList()
+        }else{
+          proxy.$message.error("清除失败")
         }
-      } else {
-        proxy.$message.error("请选择要删除的数据");
+      }else{
+        proxy.$message.error("请选择要删除的数据")
       }
-    };
+    }
     // 表格批量选择
-    const handleSelectionChange = (list) => {
-      const arr = [];
-      list.map((item, index) => {
-        arr[index] = item.userId;
-      });
-      checkedUserIds.value = arr;
-    };
+    const handleSelectionChange = (list)=>{
+      const arr = []
+      list.map((item,index)=>{
+        arr[index] = item.userId
+      })
+      checkedUserIds.value = arr
+    }
     // 新增用户事件
-    const handleCreate = () => {
-      action.value = "add";
-      addUserDialog.value = true;
-    };
+    const handleCreate = ()=>{
+      action.value = "add"
+      addUserDialog.value = true
+    }
     // 新增用户取消按钮
-    const handleClose = () => {
+    const handleClose = ()=>{
       proxy.$refs.dialogForm.resetFields();
-      addUserDialog.value = false;
-    };
+      addUserDialog.value = false
+    }
     // 新增用户确定按钮
-    const handleSubmit = () => {
-      proxy.$refs.dialogForm.validate(async (valid) => {
-        if (valid) {
+    const handleSubmit = ()=>{
+      proxy.$refs.dialogForm.validate(async (valid)=>{
+        if(valid){
           let params = toRaw(userForm);
-          params.userEmail += "@imooc.com";
-          params.action = action.value;
+          params.userEmail += "@imooc.com"
+          params.action = action.value
           let response = await proxy.$request({
-            method: "post",
-            url: "/users/operate",
-            data: params,
-            mock: false,
-          });
+            method:"post",
+            url:"/users/operate",
+            data:params,
+            mock:false
+          })
           proxy.$refs.dialogForm.resetFields();
           addUserDialog.value = false;
-          proxy.$message.success("用户创建成功");
-          getUserList();
+          proxy.$message.success("用户创建成功")
+          getUserList()
         }
-      });
-    };
-    onMounted(() => {
+      })
+    }
+    onMounted(()=>{
       getUserList();
       getRoleList();
-      getDeptList();
-    });
+      getDeptList()
+    })
     // 获取用户列表接口
-    const getUserList = async () => {
-      let params = { ...user, ...pager };
+    const getUserList = async ()=>{
+      let params = {...user,...pager}
       let response = await proxy.$request({
-        method: "get",
-        url: "/users/all/list",
-        data: params,
-        mock: false,
-      });
+        method:"get",
+        url:"/users/all/list",
+        data:params,
+        mock:false
+      })
       userList.value = response.list;
-      pager.total = response.page.total;
-    };
+      pager.total = response.page.total
+    }
     // 获取部门列表
-    const getDeptList = async () => {
+    const getDeptList = async ()=>{
       let response = await proxy.$request({
-        method: "get",
-        url: "/dept/list",
-      });
-      deptList.value = response;
-    };
+        method:"get",
+        url:"/dept/list"
+      })
+      deptList.value = response
+    }
     // 获取角色列表
-    const getRoleList = async () => {
+    const getRoleList = async ()=>{
       let response = await proxy.$request({
-        method: "get",
-        url: "/roles/allList",
-        mock: false,
-      });
-      roleList.value = response;
-    };
+        method:'get',
+        url:'/roles/allList',
+        mock:false
+      })
+      roleList.value = response
+    }
+
 
     return {
       user,
@@ -388,26 +382,26 @@ export default {
       handleSelectionChange,
       handleCreate,
       handleClose,
-      handleSubmit,
-    };
-  },
-};
+      handleSubmit
+    } 
+  }
+}
 </script>
 
 <style lang="scss" scoped>
-.query-from,
-.base-table {
-  background: #fff;
-  padding: 20px;
-}
-.base-table {
-  .action {
-    padding-bottom: 20px;
+  .query-from,
+  .base-table{
+    background: #fff;
+    padding: 20px;
   }
-  .pagination {
-    display: flex;
-    justify-content: center;
-    margin-top: 20px;
+  .base-table{
+    .action{
+      padding-bottom: 20px;
+    }
+    .pagination{
+      display: flex;
+      justify-content: center;
+      margin-top: 20px;
+    }
   }
-}
 </style>

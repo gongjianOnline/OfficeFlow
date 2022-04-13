@@ -43,10 +43,74 @@
         </el-table-column>
       </el-table>
     </div>
+    <!-- 模态框 -->
+    <el-dialog title="休假申请"
+      v-model="showModal"
+      width="70%">
+      <el-form ref="dialogForm" 
+        :rules="rules"
+        :model="leaveForm" 
+        label-width="120px">
+        <el-form-item label="休假类型" 
+          prop="applyType" 
+          required>
+          <el-select v-model="leaveForm.applyType">
+            <el-option label="事假" :value="1"></el-option>
+            <el-option label="调休" :value="2"></el-option>
+            <el-option label="年假" :value="3"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="休假时间" 
+              required>
+          <el-row>
+            <el-col :span="8">
+              <el-form-item
+                prop="startTime">
+                <el-date-picker
+                  v-model="leaveForm.startTime"
+                  type="date"
+                  placeholder="选择开始日期"
+                  @change="(val)=>handleDateChange('startTime',val)"></el-date-picker>
+              </el-form-item>
+            </el-col>
+            <el-col :span="1">-</el-col>
+            <el-col :span="8">
+              <el-form-item
+              prop="endTime"
+              required>
+                <el-date-picker
+                  v-model="leaveForm.endTime"
+                  type="date"
+                  placeholder="选择结束日期"
+                  @change="(val)=>handleDateChange('startTime',val)"></el-date-picker>
+              </el-form-item>
+            </el-col>
+          </el-row>
+        </el-form-item>
+        <el-form-item label="休假时长">  
+          {{leaveForm.leaveTime}}
+        </el-form-item>
+        <el-form-item label="休假原因" prop="reasons">
+          <el-input 
+            type="textarea"
+            :row="3"
+            placeholder="请输入请假原因"
+            v-model="leaveForm.reasons"></el-input>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="handleClose('dialogForm')">取消</el-button>
+          <el-button type="primary" @click="handleSubmit">确定</el-button>
+        </span>
+      </template>
+
+    </el-dialog>
   </div>
 </template>
 
 <script>
+import { Key } from "@element-plus/icons"
 import {ref,reactive,getCurrentInstance, onMounted} from "vue"
 import utils from "../utils/utils"
 export default {
@@ -92,18 +156,18 @@ export default {
       },
       {
         label:"休假原因",
-        prop:"reason"
+        prop:"reasons"
       },
       {
         label:"申请时间",
-        prop:"createtime",
+        prop:"createTime",
         formatter:(row,column,value)=>{
           return utils.formateDate(new Date(value))
         }
       },
       {
         label:"审批人",
-        prop:"auditUser"
+        prop:"auditUsers"
       },
       {
         label:"当前审批人",
@@ -111,7 +175,7 @@ export default {
       },
       {
         label:"审批状态",
-        prop:"aapplyState",
+        prop:"applyState",
         formatter:(row,column,value)=>{
           return {
             1:"待审核",
@@ -129,10 +193,40 @@ export default {
       pageSize:10,
       total:0
     })
+    /**弹框表单 */
+    const showModal = ref(false)
+    const action = ref("create")
+    // 申请列表
+    const leaveForm = reactive({
+      applyType:1,
+      startTime:"",
+      endTime:"",
+      leaveTime:"0天",
+      reasons:""
+    })
+    const rules = reactive({
+      applyType:[
+        { required: true, message: "请选择请假类型", trigger: "blur" },
+      ],
+      startTime:[
+        { required: true, message: "请选择开始时间", trigger: "blur" },
+      ],
+      endTime:[
+        { required: true, message: "请选择开始时间", trigger: "blur" },
+      ],
+      reasons:[
+        { required: true, message: "请填写请假原因", trigger: "blur" },
+      ],
+
+    })
+    
+    
     /**挂载的生命周期 */
     onMounted(()=>{
       getApplyList()
     })  
+    
+    
     /**事件处理 */
     // 获取表格数据
     const getApplyList = async ()=>{
@@ -144,7 +238,7 @@ export default {
         mock:true
       })
       applyList.value = response.list;
-      pager.total = reaponse.page.total;
+      pager.total = response.page.total;
     }
     // 查询
     const handelQuery = ()=>{}
@@ -152,25 +246,73 @@ export default {
     const handelRestet =(formEl)=>{
       proxy.$refs[formEl].resetFields()
     }
-    // 新增
+    // 显示弹窗
     const handleCreate = ()=>{
+      showModal.value = true
+      action.value = "create"
+    }
+    //取消
+    const handleClose = (formEl)=>{
+      showModal.value = false
+      handelRestet(formEl)
+    }
+    // 提交
+    const handleSubmit = ()=>{
+      proxy.$refs.dialogForm.validate(async (valid)=>{
+        if(valid){
+          let parmas = {...leaveForm,action:action.value}
+          let response = await proxy.$request({
+            method:'post',
+            url:'/leave/operate',
+            data:parmas
+          })
+          proxy.$message.success("操作成功"),
+          handleClose('dialogForm')
+          getApplyList()
+        }
+      })
+      
 
     }
     // 编辑
     const handelEdit = ()=>{} 
     // 删除
     const handelDle = ()=>{}
+
+    /*时间定制化*/
+    const handleDateChange = (key,val)=>{
+      let {startTime,endTime} = leaveForm;
+      if(!startTime || !endTime)return;
+      if(startTime > endTime){
+        proxy.$message.error("开始日期不能晚于结束日期")
+        leaveForm.leaveTime = "0天"
+        setTimeout(()=>{
+          leaveForm[key] = ""
+        },0)
+      }else{
+        leaveForm.leaveTime = ((endTime-startTime)/(24*60*60*1000)+1)+"天"
+      }
+
+      
+    }
+
     return {
       queryForm,
       applyList,
       columns,
       pager,
+      leaveForm,
+      showModal,
+      rules,
 
       handelQuery,
       handelRestet,
       handleCreate,
       handelEdit,
-      handelDle
+      handelDle,
+      handleClose,
+      handleSubmit,
+      handleDateChange
     }
   }
 
