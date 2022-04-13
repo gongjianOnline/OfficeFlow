@@ -35,15 +35,18 @@
         </el-table-column>
         <el-table-column label="操作" width="150">
           <template #default="scope">
-            <el-button @click="handelEdit(scope.row)"
+            <el-button @click="handelDetail(scope.row)"
               size="small">查看</el-button>
-            <el-button @click="handelDle(scope.row)"
+            <el-button 
+              type="danger"
+              @click="handelDle(scope.row._id)"
+              v-if="[1,2].includes(scope.row.applyState)"
               size="small">作废</el-button>
           </template>
         </el-table-column>
       </el-table>
     </div>
-    <!-- 模态框 -->
+    <!-- 申请休假模态框 -->
     <el-dialog title="休假申请"
       v-model="showModal"
       width="70%">
@@ -104,8 +107,43 @@
           <el-button type="primary" @click="handleSubmit">确定</el-button>
         </span>
       </template>
-
     </el-dialog>
+
+    <!-- 查看审批 -->
+    <el-dialog
+      title="申请休假详情"
+      width="50%"
+      v-model="showDetailModal"
+      destroy-on-close>
+        <el-steps 
+          :active="detail.applyState>2?3:detail.applyState" 
+          align-center>
+          <el-step title="待审批"></el-step>
+          <el-step title="审批中"></el-step>
+          <el-step title="审批通过/拒绝"></el-step>
+        </el-steps>
+        <el-form label-width="120px" label-suffix=":">
+          <el-form-item label="休假类型">
+            <div>{{detail.applyTypeName}}</div>
+          </el-form-item>
+          <el-form-item label="休假时间">
+            <div>{{detail.time}}</div>
+          </el-form-item>
+          <el-form-item label="休假时长">
+            <div>{{detail.leaveTime}}</div>
+          </el-form-item>
+          <el-form-item label="休假原因">
+            <div>{{detail.reasons}}</div>
+          </el-form-item>
+          <el-form-item label="审批状态">
+            <div>{{detail.applyStateName}}</div>
+          </el-form-item>
+          <el-form-item label="审批人">
+            <div>{{detail.curAuditUserName}}</div>
+          </el-form-item>
+        </el-form>
+    </el-dialog>
+
   </div>
 </template>
 
@@ -274,10 +312,40 @@ export default {
       
 
     }
-    // 编辑
-    const handelEdit = ()=>{} 
+    // 查看
+    const handelDetail = (row)=>{
+      showDetailModal.value = true;
+      let data = {...row}
+      data.applyTypeName = {
+        1:"事假",
+        2:"调休",
+        3:"年假"
+      }[data.applyType]
+      data.time = (
+        utils.formateDate(new Date(row.startTime),'yyy-MM-dd')
+          +"到"+
+        utils.formateDate(new Date(row.endTime),'yyy-MM-dd')
+      )
+      data.applyStateName = {
+        1:'待审批',
+        2:'审批中',
+        3:'审批拒绝',
+        4:'审批通过',
+        5:'作废'
+      }[data.applyState]
+      detail.value = data;
+    } 
     // 删除
-    const handelDle = ()=>{}
+    const handelDle = async (_id)=>{
+      let params = {_id,action:"delete"}
+      let response = await proxy.$request({
+        method:"post",
+        url:'/leave/operate',
+        data:params
+      })
+      proxy.$message.success("删除成功")
+      getApplyList()
+    }
 
     /*时间定制化*/
     const handleDateChange = (key,val)=>{
@@ -296,6 +364,9 @@ export default {
       
     }
 
+    /**查看申请状态模态框 */
+    const showDetailModal = ref(false)
+    const detail = ref({})
     return {
       queryForm,
       applyList,
@@ -304,15 +375,18 @@ export default {
       leaveForm,
       showModal,
       rules,
+      showDetailModal,
+      detail,
 
       handelQuery,
       handelRestet,
       handleCreate,
-      handelEdit,
+      handelDetail,
       handelDle,
       handleClose,
       handleSubmit,
-      handleDateChange
+      handleDateChange,
+      
     }
   }
 
