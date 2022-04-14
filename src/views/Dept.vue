@@ -69,7 +69,7 @@
             <el-option v-for="item in userList"
               :key="item.userId"
               :label="item.userName"
-              :value="`${item.userId}/${item.userName}/${item.userEmail}`"></el-option>
+              :value='`${item.userId}/${item.userName}/${item.userEmail}`'></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="部门邮箱" prop="userEmail">
@@ -161,7 +161,7 @@ export default {
         url:'/users/all/list',
         mock:false
       })
-      this.userList = response
+      this.userList = response.list
     },
     // 重置表单
     handleReset(form){

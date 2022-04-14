@@ -346,7 +346,8 @@ export default{
     const getDeptList = async ()=>{
       let response = await proxy.$request({
         method:"get",
-        url:"/dept/list"
+        url:"/dept/list",
+        mock:false
       })
       deptList.value = response
     }

@@ -37,7 +37,7 @@
           <template #default="scope">
             <el-button @click="handelDetail(scope.row)"
               size="small">查看</el-button>
-            <el-button 
+            <el-button
               type="danger"
               @click="handelDle(scope.row._id)"
               v-if="[1,2].includes(scope.row.applyState)"
@@ -273,7 +273,7 @@ export default {
         method:"get",
         url:"/leave/list",
         data:params,
-        mock:true
+        mock:false
       })
       applyList.value = response.list;
       pager.total = response.page.total;
